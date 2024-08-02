@@ -1,13 +1,15 @@
+import 'package:bloc_mvvm/config/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton(
-      {super.key,
-      required this.height,
-      required this.width,
-      required this.title,
-      required this.bgColor,
-      required this.onTap});
+  const CustomButton({
+    super.key,
+    required this.height,
+    required this.width,
+    required this.title,
+    required this.bgColor,
+    required this.onTap,
+  });
   final double height;
   final double width;
   final String title;
@@ -29,6 +31,7 @@ class CustomButton extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 18,
+              color: AppColors.white,
               fontWeight: FontWeight.w500,
             ),
           ),

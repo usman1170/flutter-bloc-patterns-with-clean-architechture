@@ -1,7 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:developer';
-
 import 'package:bloc_mvvm/bloc/auth_bloc/auth_bloc.dart';
 import 'package:bloc_mvvm/config/colors.dart';
 import 'package:bloc_mvvm/config/components/custom_button.dart';
@@ -9,18 +5,17 @@ import 'package:bloc_mvvm/config/components/snakbars.dart';
 import 'package:bloc_mvvm/config/routes/routes.dart';
 import 'package:bloc_mvvm/config/routes/routes_name.dart';
 import 'package:bloc_mvvm/utils/enums.dart';
-import 'package:bloc_mvvm/utils/validations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   FocusNode emailFocus = FocusNode();
@@ -35,14 +30,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log("login top build");
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Login Screen"),
+          title: const Text("Sign Up Screen"),
         ),
         body: BlocProvider(
           create: (context) => _authBloc,
@@ -61,11 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       focusNode: emailFocus,
                       onChanged: (value) {},
                       onFieldSubmitted: (value) {},
-                      validator: (value) => value!.isEmpty
-                          ? "Enter Email"
-                          : !Validations().isValidEmail(value)
-                              ? "Please Enter Valid Email"
-                              : null,
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter Email" : null,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.email),
@@ -83,11 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       focusNode: passwordFocus,
                       onChanged: (value) {},
                       onFieldSubmitted: (value) {},
-                      validator: (value) => value!.isEmpty
-                          ? "Enter Password"
-                          : value.length < 6
-                              ? "Password must contain atleast 6 characters"
-                              : null,
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter Password" : null,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock),
@@ -100,25 +88,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 20,
                     ),
                     BlocListener<AuthBloc, AuthState>(
-                      listenWhen: (previous, current) =>
-                          current.authStatus != previous.authStatus,
-                      listener: (context, state) async {
+                      listener: (context, state) {
                         if (state.authStatus == AuthStatus.success) {
-                          await Snakbars.flushBar(
+                          Snakbars.flushBar(
                             context,
-                            "Success : ${state.msg}",
+                            "Sign Up : ${state.msg}",
                             AppColors.greenColor,
                           );
-                        }
-                        if (state.authStatus == AuthStatus.failed) {
-                          await Snakbars.flushBar(
-                            context,
-                            "Error : ${state.msg}",
-                            AppColors.greenColor,
-                          );
-                        }
-                        if (state.authStatus == AuthStatus.loading) {
-                          await Snakbars.simpleSnackBar(context, "Loading");
                         }
                       },
                       child: BlocBuilder<AuthBloc, AuthState>(
@@ -126,18 +102,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           return CustomButton(
                             height: 55,
                             width: MediaQuery.of(context).size.width,
-                            title: state.authStatus == AuthStatus.loading
-                                ? "Loading..."
-                                : "Login",
+                            title: "Sign Up",
                             bgColor: AppColors.greenColor,
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
-                                context.read<AuthBloc>().add(
-                                      LoginEvent(
-                                        email: _email.text.toString(),
-                                        password: _password.text.toString(),
-                                      ),
-                                    );
+                                context.read<AuthBloc>().add(SignUpEvent(
+                                    email: _email.text,
+                                    password: _password.text));
+                                // Snakbars.simpleSnackBar(context,
+                                //     "Email : ${_email.text}\nPassword : ${_password.text}");
                               } else {}
                             },
                           );
@@ -149,9 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Routes().pushnamed(context, signUpRoute);
+                        Routes().pushnamedAndRemovedUntil(context, loginRoute);
                       },
-                      child: const Text("Didn't have account? Sign Up"),
+                      child: const Text("Back to Login"),
                     ),
                     const SizedBox(
                       height: 50,
